@@ -10,8 +10,7 @@ passlib[bcrypt]==1.7.4
 # AI APIs
 groq==0.9.0
 google-generativeai==0.7.2
-anthropic>=0.40.0          # Claude: Haiku (Pro) + Sonnet (Enterprise) + Opus (Deep Audit)
-
+anthropic>=0.40.0
 # Payments
 razorpay==1.4.1
 
