@@ -18,3 +18,4 @@ razorpay==1.4.1
 python-multipart==0.0.9
 bcrypt==4.0.1
 reportlab>=4.1.0
+setuptools>=65.0.0
