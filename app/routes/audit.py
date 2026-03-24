@@ -16,7 +16,6 @@ from typing import Optional
 from datetime import datetime
 from bson import ObjectId
 import base64
-import razorpay
 import hashlib
 import hmac
 
