@@ -8,7 +8,6 @@ Plans:
   Deep Audit → $20 per audit   | Claude Opus + Extended Thinking (any plan)
 """
 
-import razorpay
 import hashlib
 import hmac
 from fastapi import APIRouter, Depends, HTTPException
