@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     # ── JWT ───────────────────────────────────────────────────────────────────
     JWT_SECRET: str = "change-this-secret-in-production"
     JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_HOURS: int = 168
+    JWT_EXPIRE_HOURS: int = 48
 
     # ── AI APIs ───────────────────────────────────────────────────────────────
     GROQ_API_KEY: str = ""

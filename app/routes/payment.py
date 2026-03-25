@@ -137,7 +137,8 @@ async def create_razorpay_order(
             "features":  PLAN_FEATURES.get(req.plan, {})
         }
     except Exception as e:
-        raise HTTPException(500, f"Payment error: {str(e)}")
+        print(f"❌ Payment error: {e}")
+        raise HTTPException(500, "Payment processing failed. Please try again.")
 
 
 @router.post("/razorpay/verify")

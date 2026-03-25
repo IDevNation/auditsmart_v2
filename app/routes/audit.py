@@ -9,7 +9,7 @@ Endpoints:
   GET  /audit/report/{id}/pdf → Download PDF
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 from typing import Optional
@@ -19,10 +19,15 @@ import base64
 import hashlib
 import hmac
 
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.utils.auth import get_current_user
 from app.database import get_db
 from app.agents.pipeline import run_audit_pipeline
 from app.config import settings
+
+router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter()
 
@@ -123,7 +128,9 @@ async def save_audit(db, user: dict, req, result: dict, plan_used: str) -> dict:
 
 # ── REGULAR AUDIT ──────────────────────────────────────────────────────────────
 @router.post("/scan")
+@limiter.limit("3/minute")
 async def scan_contract(
+    request: Request,
     req: AuditRequest,
     current_user: dict = Depends(get_current_user)
 ):
@@ -138,7 +145,7 @@ async def scan_contract(
     audits_left = current_user.get("free_audits_remaining", 0)
 
     # Quota check
-    if audits_left <= 0 and plan != "enterprise":
+    if audits_left <= 0:
         raise HTTPException(402, {
             "error": "Audit limit reached",
             "message": f"Your {plan} plan limit is reached. Upgrade to continue.",
@@ -154,8 +161,8 @@ async def scan_contract(
             plan=plan
         )
     except Exception as e:
-        print(f"❌ Pipeline error: {e}")
-        raise HTTPException(500, f"Audit pipeline error: {str(e)}")
+        print(f"❌ Audit pipeline error: {e}")
+        raise HTTPException(500, "Audit scan failed. Please try again.")
 
     audit_doc = await save_audit(db, current_user, req, result, plan)
 
@@ -223,7 +230,8 @@ async def create_deep_audit_order(
         }
     except Exception as e:
         print(f"❌ Razorpay order error: {e}")
-        raise HTTPException(500, f"Payment error: {str(e)}")
+        print(f"❌ Payment error: {e}")
+        raise HTTPException(500, "Payment processing failed. Please try again.")
 
 
 # ── DEEP AUDIT: Verify Payment + Run Audit ────────────────────────────────────
@@ -277,7 +285,8 @@ async def verify_deep_audit_and_run(
         )
     except Exception as e:
         print(f"❌ Deep Audit pipeline error: {e}")
-        raise HTTPException(500, f"Audit error: {str(e)}")
+        print(f"❌ Deep audit error: {e}")
+        raise HTTPException(500, "Audit failed. Please try again.")
 
     # Save audit with payment reference
     audit_doc = await save_audit(db, current_user, req, result, "deep_audit")

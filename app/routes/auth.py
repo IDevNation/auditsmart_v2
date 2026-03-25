@@ -1,11 +1,14 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.database import get_db
 from app.utils.auth import hash_password, verify_password, create_token
 from app.config import settings
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 class RegisterRequest(BaseModel):
@@ -35,7 +38,8 @@ def user_response(user: dict, token: str) -> dict:
 
 
 @router.post("/register", status_code=201)
-async def register(req: RegisterRequest):
+@limiter.limit("5/minute")
+async def register(request: Request, req: RegisterRequest):
     db = get_db()
 
     if len(req.password) < 8:
@@ -68,7 +72,8 @@ async def register(req: RegisterRequest):
 
 
 @router.post("/login")
-async def login(req: LoginRequest):
+@limiter.limit("10/minute")
+async def login(request: Request, req: LoginRequest):
     db = get_db()
 
     user = await db.users.find_one({"email": req.email.lower()})
