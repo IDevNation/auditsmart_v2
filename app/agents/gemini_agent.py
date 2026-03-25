@@ -12,56 +12,61 @@ def configure():
         _configured = True
 
 
-# v2.0 — MASSIVELY improved prompt covering ALL vulnerability categories
-# specifically targeting categories that v1 missed
+# v3.0 — 30-point checklist covering all vulnerability classes
 PROMPT = """\
-You are a world-class smart contract security auditor conducting a comprehensive audit.
+You are a world-class smart contract security auditor. Analyze this contract methodically.
 
-Analyze this Solidity contract for ALL vulnerability types. You MUST check every single function.
+MANDATORY 30-POINT CHECKLIST — you MUST check EVERY item:
 
-MANDATORY VULNERABILITY CHECKLIST — check ALL of these:
+CRITICAL CLASS:
+1. REENTRANCY: State updated AFTER external call? Missing nonReentrant on withdraw/emergencyWithdraw?
+2. SELFDESTRUCT: Any selfdestruct() function? Reports as CRITICAL rug-pull vector.
+3. DELEGATECALL: delegatecall to arbitrary/user-supplied address? Can overwrite storage slots.
+4. INITIALIZATION: Can initialize() be called by anyone? Can it be called multiple times? Silent return vs revert?
+5. GOVERNANCE EXECUTION: Can proposals execute arbitrary calldata on arbitrary targets? No quorum?
+6. UNPROTECTED PAUSE: Can anyone call setPaused/pause/unpause without access control?
+7. MIGRATION/DRAIN: Functions that move ALL funds to arbitrary address (migrateVault, emergencyDrain)?
+8. UNDELEGATION: Can anyone undelegate/revoke someone else's delegated shares?
 
-1. REENTRANCY: Check every function with external calls. Is CEI (Checks-Effects-Interactions) pattern followed? Are state updates AFTER external calls?
-2. ACCESS CONTROL: Check every function — does it have proper onlyOwner/role checks? Can anyone call critical functions like pause/unpause?
-3. INTEGER MATH: Are unchecked blocks used? Can overflow/underflow occur?
-4. SELFDESTRUCT/DELEGATECALL BACKDOORS: Does the contract have selfdestruct()? Does it have delegatecall to arbitrary addresses? These are CRITICAL rug-pull vectors.
-5. SIGNATURE VERIFICATION: If ecrecover is used — is there a nonce? Is chainId included? Is the zero-address check done on the recovered address?
-6. ERC20 SAFETY: Does transferFrom check return value? Are fee-on-transfer tokens handled? Is SafeERC20 used?
-7. ORACLE MANIPULATION: Are price oracles validated? Is there staleness checking? Are price bounds enforced?
-8. SHARE PRICE MANIPULATION: Can the first depositor manipulate share price? Can shares round to zero?
-9. FLASH LOAN: Is the flash loan repayment check correct? Can it be bypassed via selfdestruct ETH donation?
-10. GOVERNANCE: Is there a quorum requirement? Can proposals execute arbitrary calls? Is voting power snapshot-based?
-11. FEE VALIDATION: Can fees be set above 100%? Are there upper bounds?
-12. WITHDRAWAL DELAY: Is the delay meaningful or set to 0? Can it be set to infinity by owner?
-13. ACCOUNTING: Do all deposit/withdraw paths update totalDeposited consistently?
-14. DOS: Are there unbounded loops? Can external call failures block other users?
-15. FUND LOCKING: Can user tokens/ETH get permanently locked?
-16. INITIALIZATION: Can initialize() be called multiple times? Can anyone call it?
-17. UNUSED VARIABLES: Are there declared-but-unused state variables (e.g., pendingOwner)?
-18. TWO-STEP OWNERSHIP: Is ownership transfer single-step (dangerous) or two-step (safe)?
+HIGH CLASS:
+9. UNCHECKED MATH: Any 'unchecked { }' blocks in contract or libraries? Bypasses 0.8+ overflow protection.
+10. SHARE MANIPULATION: First depositor attack — deposit 1 wei, donate ETH, next user gets 0 shares.
+11. SHARE ROUNDING: shares = amount * totalShares / totalDeposited — can round to 0 for small deposits.
+12. ORACLE NO VALIDATION: External price oracle with no staleness check, no bounds (price could be 0 or max).
+13. SIGNATURE REPLAY: ecrecover without nonce, without chainId, without address(0) check on recovered signer.
+14. ENCODEPACKED COLLISION: abi.encodePacked with multiple variable-length args — hash collision risk.
+15. UNSAFE ERC20: transferFrom without checking return value. USDT doesn't return bool.
+16. FEE-ON-TRANSFER: Records _amount but token has transfer fee — actual received is less.
+17. EMERGENCY BYPASS: emergencyWithdraw skips withdrawal delay, or doesn't decrement totalDeposited.
+18. STRATEGY TRUST: depositToStrategy/withdrawFromStrategy trusts external contract without verifying amounts.
+19. VOTE MANIPULATION: Voting power based on current shares (not snapshot) — vote, transfer, vote again.
+20. OWNER TOKEN LOCK: Only owner can withdraw deposited ERC20 tokens — users' funds permanently locked.
+21. DELEGATION NO LOCK: Shares "delegated" but delegator can still withdraw/use them. Double-counting.
+22. REWARD DOS: distributeRewards() loops over unbounded array with external calls — gas limit DoS.
+23. NO FEE CAP: setPerformanceFee has no max — owner can set 100%+ fee.
+24. FLASH LOAN RETURN: EIP-3156 return value not checked against expected hash.
+25. INCOMPLETE FUNCTION: Function accepts payment (payable) but logic is missing/incomplete.
 
-IMPORTANT RULES:
-- Do NOT report tx.origin issues unless tx.origin is actually used in the code
-- Do NOT report "msg.sender is insecure" — that is not a real vulnerability
-- DO report selfdestruct and delegatecall backdoors as CRITICAL
-- DO report missing signature replay protection as HIGH
-- DO report unsafe ERC20 transfer (no return value check) as HIGH
-- Each finding must reference the exact function name
-- Do NOT repeat the same finding multiple times
+MEDIUM/LOW CLASS:
+26. DIVISION BY ZERO: Any a/b where b could be 0 (totalShares = 0, etc).
+27. UNBOUNDED ARRAY: depositors[] or similar array with no size limit — DoS via gas.
+28. GUARDIAN ZERO: Guardian/role variable declared but never initialized — address(0) forever locked.
+29. SINGLE-STEP OWNERSHIP: transferOwnership directly sets owner. pendingOwner exists but unused.
+30. RECEIVE WITHOUT ACCOUNTING: receive()/fallback() accepts ETH but doesn't update totalDeposited.
 
-Return ONLY a JSON array. No text outside JSON. No markdown backticks.
+RULES:
+- Report ONLY vulnerabilities you ACTUALLY FIND in the code
+- If a pattern is NOT in the code, do NOT report it
+- Do NOT say "not found" or "not present" — just skip that check
+- Each finding needs exact function name
+- Do NOT repeat same finding twice
+- Use severity: critical, high, medium, low, info
 
-Each finding:
-{
-  "type": "Vulnerability Name",
-  "severity": "critical|high|medium|low|info",
-  "line": "line number or range",
-  "function": "function_name",
-  "description": "Detailed explanation with exact exploit path",
-  "recommendation": "Specific fix with code suggestion"
-}
+Return ONLY a JSON array. No text outside JSON. No markdown.
 
-Contract to audit:
+Each finding: {"type":"Name","severity":"critical|high|medium|low|info","line":"number","function":"name","description":"detailed","recommendation":"fix"}
+
+Contract:
 ```solidity
 CONTRACT_CODE
 ```"""

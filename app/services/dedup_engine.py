@@ -44,7 +44,48 @@ FALSE_POSITIVE_PATTERNS = [
         ),
         "reason": "Generic unchecked math without specific location"
     },
+    # === NEW: "Not found" / "not present" findings — agent looked but didn't find it ===
+    {
+        "check": lambda f, code: _is_not_found_finding(f),
+        "reason": "Agent reported pattern was NOT found in the code"
+    },
+    # === NEW: Finding with "N/A" or empty function AND no specific line ===
+    {
+        "check": lambda f, code: (
+            (not f.get("function") or f.get("function", "").strip().lower() in ["", "n/a", "none", "not found", "unknown"]) and
+            (not f.get("line") or f.get("line", "").strip().lower() in ["", "n/a", "none", "not found"]) and
+            f.get("severity", "").lower() not in ["info"]  # Allow info-level general findings
+        ),
+        "reason": "Finding has no specific function or line — too vague"
+    },
 ]
+
+
+def _is_not_found_finding(f: Dict) -> bool:
+    """Check if a finding is actually saying the vulnerability was NOT found."""
+    desc = (f.get("description", "") + " " + f.get("recommendation", "")).lower()
+    not_found_phrases = [
+        "not found", "not present", "no .* found", "does not exist",
+        "not applicable", "not used in the", "not detected",
+        "no quorum .* found", "no migration .* found", "not implemented",
+        "no .* present", "is not present", "was not found",
+        "no recommendation needed", "not vulnerable to this",
+        "does not use", "does not have", "does not contain",
+        "could not find", "unable to find", "no evidence of",
+        "no instances of", "not susceptible"
+    ]
+    import re as _re
+    for phrase in not_found_phrases:
+        if _re.search(phrase, desc):
+            return True
+    # Also check if finding line says "not found"
+    line_val = f.get("line", "")
+    if isinstance(line_val, str) and "not found" in line_val.lower():
+        return True
+    func_val = f.get("function", "")
+    if isinstance(func_val, str) and "not found" in func_val.lower():
+        return True
+    return False
 
 # ═══════════════════════════════════════════
 # SEVERITY UPGRADE RULES — catch misclassified severities
@@ -91,18 +132,24 @@ SEVERITY_UPGRADES = [
 # SIMILARITY GROUPS — findings that should be merged
 # ═══════════════════════════════════════════
 SIMILARITY_KEYWORDS = {
-    "reentrancy": ["reentrancy", "reentrant", "re-entrancy", "cross-function reentrancy"],
-    "overflow": ["overflow", "underflow", "arithmetic", "unchecked math", "integer overflow", "integer underflow"],
-    "oracle": ["oracle", "price manipulation", "price feed", "price oracle"],
-    "access_control": ["access control", "unprotected", "unauthorized", "missing modifier", "anyone can call"],
-    "dos": ["denial of service", "dos", "unbounded loop", "gas griefing", "gas limit"],
-    "initialization": ["initialize", "initializ", "re-init", "multiple init"],
-    "flash_loan": ["flash loan", "flashloan"],
-    "signature": ["signature", "ecrecover", "replay", "nonce", "chainid"],
-    "erc20": ["erc20", "transferfrom", "safe transfer", "return value", "fee-on-transfer"],
-    "selfdestruct": ["selfdestruct", "self-destruct", "self destruct"],
-    "delegatecall": ["delegatecall", "delegate call"],
-    "governance": ["governance", "proposal", "voting", "quorum", "vote"],
+    "reentrancy": ["reentrancy", "reentrant", "re-entrancy", "cross-function reentrancy", "cei violation"],
+    "overflow": ["overflow", "underflow", "arithmetic", "unchecked math", "integer overflow", "integer underflow", "unchecked block", "unchecked {"],
+    "oracle": ["oracle", "price manipulation", "price feed", "price oracle", "staleness", "price bounds"],
+    "access_control": ["access control", "unprotected", "unauthorized", "missing modifier", "anyone can call", "no onlyowner", "missing onlyowner"],
+    "dos": ["denial of service", "dos", "unbounded loop", "gas griefing", "gas limit", "unbounded array"],
+    "initialization": ["initialize", "initializ", "re-init", "multiple init", "re-initializ"],
+    "flash_loan": ["flash loan", "flashloan", "flash loan repayment", "eip-3156"],
+    "signature": ["signature", "ecrecover", "replay", "nonce", "chainid", "eip-712", "encodepacked collision"],
+    "erc20": ["erc20", "transferfrom", "safe transfer", "return value", "fee-on-transfer", "safeerc20"],
+    "selfdestruct": ["selfdestruct", "self-destruct", "self destruct", "migrate", "migration"],
+    "delegatecall": ["delegatecall", "delegate call", "arbitrary call", "upgrade implementation"],
+    "governance": ["governance", "proposal", "voting", "quorum", "vote", "vote manipulation"],
+    "delegation": ["delegation", "delegate shares", "undelegate", "delegated shares"],
+    "accounting": ["accounting", "totaldeposited", "total deposited", "balance mismatch", "accounting mismatch"],
+    "fee": ["fee", "performance fee", "fee cap", "fee above", "fee recipient", "fee validation"],
+    "withdrawal": ["withdrawal delay", "emergency withdraw", "timelock", "withdrawal request"],
+    "strategy": ["strategy", "strategy deposit", "strategy withdrawal", "strategy allocation"],
+    "receive_fallback": ["receive()", "fallback()", "receive function", "fallback function", "unaccounted eth"],
 }
 
 
