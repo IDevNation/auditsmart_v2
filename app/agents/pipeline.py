@@ -165,57 +165,85 @@ async def _empty_list():
     return []
 
 # Large contracts get split so agents see full code without truncation
-CHUNK_THRESHOLD = 6000  # chars — Groq context ~8K tokens ≈ ~6K chars of Solidity
+CHUNK_THRESHOLD = 4500  # chars — Groq context ~8K tokens, leave room for prompt + response
 
 
 def _split_contract(code: str) -> list:
-    """Split large contracts into overlapping chunks for better coverage."""
+    """Split large contracts into overlapping chunks for better coverage.
+    Each chunk includes: pragma/imports + state variables + a section of functions.
+    """
     if len(code) <= CHUNK_THRESHOLD:
         return [code]
 
-    # Find natural split points (function boundaries)
     lines = code.split("\n")
     chunks = []
-    current_chunk = []
-    current_size = 0
-    # Always include pragma/imports/interfaces in every chunk
+    
+    # Phase 1: Extract header (pragma, imports, interfaces) + state section
     header_lines = []
+    state_lines = []
+    function_lines = []
     in_header = True
-
+    in_state = False
+    brace_depth = 0
+    
     for line in lines:
         stripped = line.strip()
+        
         if in_header:
             if stripped.startswith("contract ") or stripped.startswith("library "):
                 in_header = False
+                in_state = True
+                state_lines.append(line)
+                if "{" in stripped:
+                    brace_depth += stripped.count("{") - stripped.count("}")
             else:
                 header_lines.append(line)
-                continue
-
+            continue
+        
+        if in_state:
+            state_lines.append(line)
+            brace_depth += stripped.count("{") - stripped.count("}")
+            # State section ends when we hit the first function
+            if stripped.startswith("function ") or stripped.startswith("modifier "):
+                in_state = False
+                function_lines.append(line)
+            continue
+        
+        function_lines.append(line)
+    
+    # Phase 2: Split function_lines into chunks at function boundaries
+    context = "\n".join(header_lines) + "\n" + "\n".join(state_lines[:50])  # First 50 state lines
+    context_size = len(context)
+    max_chunk_body = CHUNK_THRESHOLD - min(context_size, 1500)  # Reserve space for context
+    
+    current_chunk = []
+    current_size = 0
+    
+    for line in function_lines:
+        stripped = line.strip()
         current_chunk.append(line)
         current_size += len(line) + 1
-
-        # Split at function boundaries when chunk is large enough
-        if current_size > CHUNK_THRESHOLD * 0.7 and (
+        
+        # Split at function boundaries
+        if current_size > max_chunk_body and (
             stripped.startswith("function ") or
             stripped.startswith("// ---") or
-            stripped == "}"
+            stripped.startswith("// ===") or
+            (stripped == "}" and current_size > max_chunk_body * 0.6)
         ):
-            header = "\n".join(header_lines)
-            chunk_text = header + "\n" + "\n".join(current_chunk)
+            chunk_text = context + "\n// ... (functions in this section):\n" + "\n".join(current_chunk)
             chunks.append(chunk_text)
             current_chunk = []
             current_size = 0
-
+    
     # Add remaining
     if current_chunk:
-        header = "\n".join(header_lines)
-        chunk_text = header + "\n" + "\n".join(current_chunk)
+        chunk_text = context + "\n// ... (functions in this section):\n" + "\n".join(current_chunk)
         chunks.append(chunk_text)
-
-    # If splitting produced nothing useful, just use original
+    
     if not chunks:
         return [code]
-
+    
     print(f"   📦 Contract split into {len(chunks)} chunks: {[len(c) for c in chunks]}")
     return chunks
 

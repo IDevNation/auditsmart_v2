@@ -90,7 +90,7 @@ async def run_gemini_analysis(contract_code: str) -> list:
         )
 
         prompt = PROMPT.replace("CONTRACT_CODE",
-                                contract_code[:15000])
+                                contract_code[:50000])
 
         print("🔍 Gemini agent: sending request...")
         response = await model.generate_content_async(prompt)

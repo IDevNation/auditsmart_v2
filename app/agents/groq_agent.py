@@ -61,16 +61,22 @@ async def run_groq_analysis(contract_code: str, focus: str, agent_name: str) -> 
     try:
         prompt = f"""Audit this Solidity contract. Focus SPECIFICALLY on: {focus}
 
-IMPORTANT: Only report issues you can see in the actual code. Reference exact function names.
-If a function has a nonReentrant modifier, do NOT report reentrancy for that function.
-If the code never uses tx.origin, do NOT report tx.origin issues.
+IMPORTANT RULES:
+- ONLY report issues you can see in the actual code below.
+- Reference exact function names.
+- If a function has nonReentrant modifier, do NOT report reentrancy for it.
+- If the code never uses tx.origin, do NOT report tx.origin issues.
+- If a vulnerability pattern is NOT in the code, do NOT report it. Just return empty array.
+- DO NOT say "not found" or "not present" — simply skip patterns that don't apply.
+- Check EVERY function in the code below. Do not skip any.
+- Report each distinct vulnerability as a separate finding.
 
 Solidity contract to audit:
 ```solidity
-{contract_code[:10000]}
+{contract_code}
 ```
 
-Return ONLY a JSON array of findings. Be precise and specific."""
+Return ONLY a JSON array of findings. Be precise and specific. If no issues found, return []."""
 
         print(f"🔍 Groq {agent_name}: sending request (focus: {focus[:50]}...)")
 
