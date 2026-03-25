@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""           # Free plan uses this
     ANTHROPIC_API_KEY: str = ""        # Pro, Enterprise, Deep Audit
 
+    # ── Gemini Settings ────────────────────────────────────────────────────────
+    GEMINI_MODEL: str = "gemini-1.5-pro"
+    GEMINI_MAX_TOKENS: int = 4096
+
     # ── Groq Settings ─────────────────────────────────────────────────────────
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
     GROQ_MAX_TOKENS: int = 4096
