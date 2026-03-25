@@ -26,10 +26,10 @@ class Settings(BaseSettings):
     # free       → Groq + Gemini              (~$0.05/audit)
     # pro        → Groq + claude-haiku        (~$0.12/audit)
     # enterprise → Groq + claude-sonnet       (~$0.49/audit)
-    # deep_audit → Full claude-opus-4-5 only  (~$1.78/audit, charges $20)
+    # deep_audit → Full claude-opus-4-6 only  (~$1.78/audit, charges $20)
     CLAUDE_HAIKU_MODEL: str = "claude-haiku-4-5-20251001"
-    CLAUDE_SONNET_MODEL: str = "claude-sonnet-4-6"
-    CLAUDE_OPUS_MODEL: str = "claude-opus-4-5"
+    CLAUDE_SONNET_MODEL: str = "claude-sonnet-4-6-20250514"
+    CLAUDE_OPUS_MODEL: str = "claude-opus-4-6-20250625"
     CLAUDE_TIMEOUT_SECONDS: int = 120
 
     # ── Payments ──────────────────────────────────────────────────────────────

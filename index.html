@@ -799,6 +799,7 @@ async function runAudit(){
 }
 
 function renderResults(d){
+  const oldExtras=document.getElementById('auditExtras');if(oldExtras)oldExtras.remove();
   const rl = (d.risk_level||'unknown').toLowerCase();
   const banner = document.getElementById('riskBanner');
   banner.className = 'risk-banner '+rl;
@@ -823,26 +824,56 @@ function renderResults(d){
   if(!d.findings||d.findings.length===0){
     list.innerHTML=`<div class="no-findings"><div class="no-findings-icon">✅</div><div class="no-findings-title">No Vulnerabilities Found</div><div class="no-findings-sub">Contract passed all 10 agent checks</div></div>`;
   }else{
-    d.findings.forEach(f=>{
+    const sevOrder={critical:0,high:1,medium:2,low:3,info:4};
+    const sorted=[...d.findings].sort((a,b)=>(sevOrder[(a.severity||'info').toLowerCase()]??4)-(sevOrder[(b.severity||'info').toLowerCase()]??4));
+    sorted.forEach(f=>{
       const sev=(f.severity||'INFO').toUpperCase();
+      const src=f.source||f.agent||'';
       list.innerHTML+=`<div class="finding-card">
         <div class="finding-header">
-          <div class="finding-title">${esc(f.title||f.vulnerability_type||'Finding')}</div>
+          <div class="finding-title">${esc(f.title||f.type||f.vulnerability_type||'Finding')}</div>
           <span class="sev-badge sev-${sev}">${sev}</span>
         </div>
         <div class="finding-desc">${esc(f.description||f.explanation||'')}</div>
         <div class="finding-meta">
-          ${f.agent?`<span class="finding-agent">${esc(f.agent)}</span>`:''}
-          ${f.line_number?`<span class="finding-line">Line ${f.line_number}</span>`:''}
+          ${src?`<span class="finding-agent">${esc(src)}</span>`:''}
+          ${f.function?`<span class="finding-line">fn: ${esc(f.function)}</span>`:''}
+          ${f.line_number||f.line?`<span class="finding-line">Line ${f.line_number||f.line}</span>`:''}
           ${f.confidence?`<span class="finding-agent">Confidence: ${f.confidence}</span>`:''}
         </div>
-        ${f.recommendation?`<div style="margin-top:8px;font-size:11px;color:var(--g1);font-family:var(--fm)">Fix: ${esc(f.recommendation)}</div>`:''}
+        ${f.recommendation?`<div style="margin-top:8px;font-size:11px;color:var(--g1);font-family:var(--fm)">💡 Fix: ${esc(f.recommendation)}</div>`:''}
+        ${f.auto_fix?`<div style="margin-top:6px;padding:8px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:4px;font-size:10px;font-family:'Courier New',monospace;color:#10b981;white-space:pre-wrap">✅ Auto-Fix:\n${esc(f.auto_fix.fixed_code||f.auto_fix.explanation||'')}</div>`:''}
+        ${f.exploit_scenario?`<div style="margin-top:6px;font-size:10px;color:#fbbf24;font-family:var(--fm)">⚠️ Exploit: ${esc(f.exploit_scenario)}</div>`:''}
       </div>`;
     });
   }
 
   const pdfBtn = document.getElementById('pdfBtn');
   pdfBtn.style.display = d.pdf_available ? 'block' : 'none';
+
+  // Deployment Verdict (Pro/Enterprise/Deep Audit)
+  let verdictHtml='';
+  if(d.deployment_verdict){
+    const vc={
+      'SAFE TO DEPLOY':'background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#10b981',
+      'DEPLOY WITH CAUTION':'background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:#fbbf24',
+      'DO NOT DEPLOY':'background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444'
+    };
+    const vs=vc[d.deployment_verdict]||vc['DEPLOY WITH CAUTION'];
+    verdictHtml=`<div style="margin:12px 0;padding:12px;border:1px solid;border-radius:6px;text-align:center;font-family:var(--fm);font-size:10px;letter-spacing:2px;${vs}">⚡ VERDICT: <b style="font-size:13px">${esc(d.deployment_verdict)}</b></div>`;
+  }
+  // Thinking Chain (Deep Audit exclusive)
+  let thinkHtml='';
+  if(d.thinking_chain){
+    thinkHtml=`<details style="margin:12px 0"><summary style="cursor:pointer;font-family:var(--fm);font-size:10px;color:#fbbf24;letter-spacing:1px;padding:8px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:4px">🧠 VIEW AI REASONING CHAIN (Extended Thinking)</summary><div style="padding:12px;margin-top:4px;background:rgba(245,158,11,.03);border:1px solid rgba(245,158,11,.08);border-radius:4px;font-size:10px;font-family:'Courier New',monospace;color:var(--w3);white-space:pre-wrap;max-height:400px;overflow-y:auto">${esc(d.thinking_chain)}</div></details>`;
+  }
+  // Summary
+  let summaryHtml='';
+  if(d.summary){
+    summaryHtml=`<div style="margin:8px 0;padding:10px;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.1);border-radius:4px;font-size:11px;color:var(--w3);font-family:var(--fm)">${esc(d.summary)}</div>`;
+  }
+  const extraSection=document.getElementById('findingsList');
+  extraSection.insertAdjacentHTML('afterend',`<div id="auditExtras">${verdictHtml}${summaryHtml}${thinkHtml}</div>`);
 }
 
 function resetAudit(){
