@@ -92,12 +92,27 @@ def serialize_audit_full(a: dict) -> dict:
 
 
 async def save_audit(db, user: dict, req, result: dict, plan_used: str) -> dict:
-    """Save audit result to MongoDB and return saved doc."""
+    """Save audit result to MongoDB. Contract code is NOT stored — only SHA256 hash."""
+    import hashlib
+    import secrets
+
+    # Generate unique Report ID: AS-YYYY-XXXXX
+    year = datetime.utcnow().strftime("%Y")
+    count = await db.audits.count_documents({}) + 1
+    report_id = f"AS-{year}-{count:05d}"
+
+    # SHA256 hash of contract code (proves which code was scanned)
+    contract_hash = hashlib.sha256(req.contract_code.encode()).hexdigest()
+    contract_size = len(req.contract_code)
+
     audit_doc = {
         "user_id":             user["_id"],
+        "report_id":           report_id,
         "contract_name":       req.contract_name,
         "chain":               req.chain,
-        "contract_code_hash":  hash(req.contract_code),
+        "contract_hash":       contract_hash,
+        "contract_size_chars": contract_size,
+        # ❌ CONTRACT CODE IS NOT STORED — privacy + security
         "risk_level":          result.get("risk_level", "unknown"),
         "risk_score":          result.get("risk_score", 0),
         "total_findings":      result.get("total_findings", 0),
@@ -116,9 +131,10 @@ async def save_audit(db, user: dict, req, result: dict, plan_used: str) -> dict:
         "plan_used":           plan_used,
         "has_fix_suggestions": result.get("has_fix_suggestions", False),
         "deployment_verdict":  result.get("deployment_verdict", ""),
-        "thinking_chain":      result.get("thinking_chain"),  # Deep audit only
+        "thinking_chain":      result.get("thinking_chain"),
         "is_deep_audit":       plan_used == "deep_audit",
-        "version":             "3.0",
+        "is_verified":         True,
+        "version":             "3.1",
         "created_at":          datetime.utcnow()
     }
     insert_result = await db.audits.insert_one(audit_doc)
@@ -173,6 +189,9 @@ async def scan_contract(
     )
 
     response = serialize_audit(audit_doc.copy())
+    response["report_id"] = audit_doc.get("report_id", "")
+    response["contract_hash"] = audit_doc.get("contract_hash", "")
+    response["verify_url"] = f"https://auditsmart.org/verify/{audit_doc.get('report_id', '')}"
     response["pdf_available"] = result.get("pdf_available", False)
     response["has_fix_suggestions"] = result.get("has_fix_suggestions", False)
     response["deployment_verdict"] = result.get("deployment_verdict", "")
@@ -384,3 +403,70 @@ async def download_pdf(
             "Content-Length": str(len(pdf_bytes)),
         }
     )
+
+# ── PUBLIC VERIFY ENDPOINT (no auth required) ─────────────────────────────────
+@router.get("/verify/{report_id}")
+async def verify_report(report_id: str):
+    """
+    Public endpoint — anyone can verify if a report is real.
+    No authentication needed. Returns report metadata only, no findings detail.
+    URL: auditsmart.org/verify/AS-2026-00001
+    """
+    db = get_db()
+
+    audit = await db.audits.find_one(
+        {"report_id": report_id},
+        {
+            "report_id": 1, "contract_name": 1, "chain": 1,
+            "contract_hash": 1, "contract_size_chars": 1,
+            "risk_level": 1, "risk_score": 1,
+            "total_findings": 1, "critical_count": 1,
+            "high_count": 1, "medium_count": 1, "low_count": 1,
+            "agents_used": 1, "scan_duration_ms": 1,
+            "plan_used": 1, "deployment_verdict": 1,
+            "is_verified": 1, "version": 1, "created_at": 1,
+            # NOT included: findings details, pdf_base64, user_id, thinking_chain
+        }
+    )
+
+    if not audit:
+        raise HTTPException(404, {
+            "verified": False,
+            "message": "Report not found. Check the Report ID and try again."
+        })
+
+    created = audit.get("created_at", "")
+    if hasattr(created, "isoformat"):
+        created = created.isoformat() + "Z"
+
+    return {
+        "verified": True,
+        "report": {
+            "report_id":       audit.get("report_id"),
+            "contract_name":   audit.get("contract_name", "Contract"),
+            "chain":           audit.get("chain", "ethereum"),
+            "contract_hash":   audit.get("contract_hash", ""),
+            "contract_size":   audit.get("contract_size_chars", 0),
+            "risk_level":      audit.get("risk_level", "unknown"),
+            "risk_score":      audit.get("risk_score", 0),
+            "total_findings":  audit.get("total_findings", 0),
+            "critical":        audit.get("critical_count", 0),
+            "high":            audit.get("high_count", 0),
+            "medium":          audit.get("medium_count", 0),
+            "low":             audit.get("low_count", 0),
+            "agents_used":     len(audit.get("agents_used", [])),
+            "plan":            audit.get("plan_used", "free"),
+            "verdict":         audit.get("deployment_verdict", ""),
+            "scan_duration_ms": audit.get("scan_duration_ms", 0),
+            "version":         audit.get("version", ""),
+            "scanned_at":      created,
+            "is_verified":     True,
+        },
+        "disclaimer": (
+            "This is an AI-generated security assessment by AuditSmart. "
+            "It is NOT a certified security audit and does not guarantee "
+            "the absence of vulnerabilities. For production contracts, "
+            "a professional manual audit is recommended."
+        ),
+        "verify_url": f"https://auditsmart.org/verify/{audit.get('report_id', '')}"
+    }

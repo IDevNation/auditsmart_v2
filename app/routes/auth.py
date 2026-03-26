@@ -82,24 +82,3 @@ async def login(request: Request, req: LoginRequest):
 
     token = create_token(str(user["_id"]), user["email"])
     return user_response(user, token)
-
-
-# ── TEMPORARY TEST ENDPOINT — REMOVE IN PRODUCTION ──────────────────────────
-@router.post("/test-upgrade")
-@limiter.limit("5/minute")
-async def test_upgrade(request: Request):
-    """Temporarily upgrade a user's plan for testing. REMOVE BEFORE LAUNCH."""
-    from pydantic import BaseModel as BM
-    class UpReq(BM):
-        email: str
-        plan: str
-        audits: int
-    
-    import json
-    body = await request.json()
-    db = get_db()
-    result = await db.users.update_one(
-        {"email": body.get("email", "").lower()},
-        {"$set": {"plan": body.get("plan", "free"), "free_audits_remaining": body.get("audits", 10)}}
-    )
-    return {"status": "upgraded", "modified": result.modified_count}
