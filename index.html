@@ -1019,12 +1019,60 @@ async function loadDashboard(){
 }
 
 // ═══════════════════════════════════════════
-// PAYMENTS
+// GEO PRICING — INR for India, USD for rest
 // ═══════════════════════════════════════════
-const PLAN_INFO = {
-  pro:{name:'PRO',price:'$29/month',amount:290000,features:['15 audits per month','Claude Haiku (Anthropic)','Fix code in PDF report','Deployment verdict','PDF reports','Email support']},
-  enterprise:{name:'ENTERPRISE',price:'$49/month',amount:490000,features:['20 audits per month','Claude Sonnet (Anthropic)','Full exploit scenarios','Patched code in PDF','API access','Priority support']}
+const isIndia = (()=>{
+  try{
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+    return tz.startsWith('Asia/Kolkata')||tz.startsWith('Asia/Calcutta');
+  }catch(e){return false}
+})();
+
+const PRICING = {
+  pro:  { inr:{price:'₹2,399/mo', amount:239900, symbol:'₹2,399'}, usd:{price:'$29/mo', amount:290000, symbol:'$29'} },
+  enterprise: { inr:{price:'₹3,999/mo', amount:399900, symbol:'₹3,999'}, usd:{price:'$49/mo', amount:490000, symbol:'$49'} },
+  deep: { inr:{price:'₹1,699/audit', amount:169900, symbol:'₹1,699'}, usd:{price:'$20/audit', amount:200000, symbol:'$20'} }
 };
+
+function gp(plan){return isIndia?PRICING[plan].inr:PRICING[plan].usd}
+
+const PLAN_INFO = {
+  pro:{name:'PRO',get price(){return gp('pro').price},get amount(){return gp('pro').amount},features:['15 audits per month','Claude Haiku (Anthropic)','Fix code in PDF report','Deployment verdict','PDF reports','Email support']},
+  enterprise:{name:'ENTERPRISE',get price(){return gp('enterprise').price},get amount(){return gp('enterprise').amount},features:['20 audits per month','Claude Sonnet (Anthropic)','Full exploit scenarios','Patched code in PDF','API access','Priority support']}
+};
+
+// Update pricing cards on page load
+function updatePricingDisplay(){
+  const proP=gp('pro'),entP=gp('enterprise'),deepP=gp('deep');
+  // Landing page pricing cards
+  document.querySelectorAll('.pgrid .pl').forEach((card,i)=>{
+    const ppEl=card.querySelector('.pp');
+    if(!ppEl)return;
+    if(i===0){ppEl.innerHTML=isIndia?'₹0':'$0'} // Free
+    else if(i===1){ppEl.innerHTML=proP.symbol+'<span>/mo</span>'} // Pro
+    else if(i===2){ppEl.innerHTML=entP.symbol+'<span>/mo</span>'} // Enterprise
+  });
+  // Deep Audit card
+  const deepCards=document.querySelectorAll('.pgrid .pl');
+  if(deepCards[3]){
+    const deepPP=deepCards[3].querySelector('.pp');
+    if(deepPP)deepPP.innerHTML=deepP.symbol+'<span style="-webkit-text-fill-color:rgba(128,128,160,1)">/audit</span>';
+    const deepBtn=deepCards[3].querySelector('button');
+    if(deepBtn)deepBtn.textContent='ACTIVATE — '+deepP.symbol;
+  }
+  // Proof bar
+  const proofStats=document.querySelectorAll('.ps-n');
+  proofStats.forEach(el=>{
+    if(el.textContent==='$29'||el.textContent.includes('₹'))el.textContent=proP.symbol;
+  });
+  // Deep Audit modal
+  const deepModalSub=document.querySelector('#deepAuditModal .modal-sub');
+  if(deepModalSub)deepModalSub.textContent='CLAUDE OPUS + EXTENDED THINKING — '+deepP.symbol;
+  const deepModalBtn=document.getElementById('deepAuditBtn');
+  if(deepModalBtn)deepModalBtn.textContent='PAY '+deepP.symbol+' — START DEEP AUDIT';
+}
+// Run after boot
+setTimeout(updatePricingDisplay, 1500);
 
 function openPayment(plan){
   if(!currentUser){openAuth();return}
@@ -1048,7 +1096,7 @@ async function initiatePayment(){
     const r=await fetch(API+'/payment/razorpay/create-order',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentToken},
-      body:JSON.stringify({plan:selectedPlan})
+      body:JSON.stringify({plan:selectedPlan,currency:isIndia?'INR':'USD'})
     });
     const d=await r.json();
     if(!r.ok){showErr(err,d.detail||'Failed to create order');btn.disabled=false;btn.textContent='PAY NOW';return}
@@ -1180,7 +1228,7 @@ async function initiateDeepAudit(){
   const btn=document.getElementById('deepAuditBtn');
   btn.disabled=true;btn.textContent='CREATING ORDER...';
   try{
-    const r=await fetch(API+'/audit/deep/create-order',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentToken},body:JSON.stringify({contract_code:code,contract_name:name})});
+    const r=await fetch(API+'/audit/deep/create-order',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+currentToken},body:JSON.stringify({contract_code:code,contract_name:name,currency:isIndia?'INR':'USD'})});
     const d=await r.json();
     if(!r.ok){btn.disabled=false;btn.textContent='PAY $20 — START DEEP AUDIT';toast(d.detail||'Order failed','error');return}
     const options={key:d.key_id,amount:d.amount,currency:'INR',name:'AuditSmart Deep Audit',description:'Claude Opus + Extended Thinking',order_id:d.order_id,
