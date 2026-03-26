@@ -7,7 +7,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.database import connect_db, disconnect_db
-from app.routes import auth, audit, dashboard, payment
+from app.routes import auth, audit, dashboard, payment, public
 from app.config import settings
 
 
@@ -39,7 +39,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
+        # Allow iframe embedding for badge endpoints only
+        if "/public/badge/" not in str(request.url):
+            response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
@@ -68,6 +70,7 @@ app.include_router(auth.router,      prefix="/auth",      tags=["Auth"])
 app.include_router(audit.router,     prefix="/audit",     tags=["Audit"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 app.include_router(payment.router,   prefix="/payment",   tags=["Payment"])
+app.include_router(public.router,    prefix="/public",    tags=["Public"])
 
 
 @app.get("/")
