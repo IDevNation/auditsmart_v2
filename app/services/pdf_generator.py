@@ -314,14 +314,91 @@ def generate_audit_pdf(audit_data: Dict) -> Optional[bytes]:
             rec = finding.get("recommendation", "")
             if rec:
                 elements.append(Paragraph(
-                    f"→ Recommendation: {rec}",
+                    f"→ <i>Recommendation: {rec}</i>",
                     styles['Recommendation']
+                ))
+
+            # ═══ FIX CODE RECTIFICATION (Pro/Enterprise/Deep Audit only) ═══
+            auto_fix = finding.get("auto_fix", {})
+            if auto_fix and isinstance(auto_fix, dict):
+                fix_code = auto_fix.get("fixed_code", "")
+                fix_explanation = auto_fix.get("explanation", "")
+
+                if fix_code:
+                    # "Fixed Code" section with monospace styling
+                    elements.append(Spacer(1, 4))
+                    elements.append(Paragraph(
+                        '✅ RECTIFIED CODE:',
+                        ParagraphStyle('FixLabel', parent=styles['Normal'],
+                                       fontSize=9, fontName='Helvetica-Bold',
+                                       textColor=HexColor("#00aa55"),
+                                       spaceBefore=4, spaceAfter=2)
+                    ))
+
+                    # Code block with background
+                    fix_lines = fix_code.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    fix_lines = fix_lines.replace("\n", "<br/>")
+                    elements.append(Paragraph(
+                        f'<font face="Courier" size="8" color="#1a1a2e">{fix_lines}</font>',
+                        ParagraphStyle('FixCode', parent=styles['Normal'],
+                                       fontSize=8, fontName='Courier',
+                                       backColor=HexColor("#f0fff4"),
+                                       borderColor=HexColor("#00aa55"),
+                                       borderWidth=0.5, borderPadding=6,
+                                       spaceBefore=2, spaceAfter=4,
+                                       leading=11)
+                    ))
+
+                if fix_explanation and fix_explanation != rec:
+                    elements.append(Paragraph(
+                        f'<font color="#555555" size="8">Explanation: {fix_explanation}</font>',
+                        ParagraphStyle('FixExplain', parent=styles['Normal'],
+                                       fontSize=8, spaceAfter=4)
+                    ))
+
+            # Exploit scenario (Enterprise/Deep Audit only)
+            exploit = finding.get("exploit_scenario", "")
+            if exploit:
+                elements.append(Paragraph(
+                    f'⚠️ <font color="#cc6600">Exploit Scenario: {exploit}</font>',
+                    ParagraphStyle('Exploit', parent=styles['Normal'],
+                                   fontSize=8, spaceAfter=4, leading=11,
+                                   backColor=HexColor("#fff8f0"),
+                                   borderColor=HexColor("#ff9900"),
+                                   borderWidth=0.5, borderPadding=4)
                 ))
 
             elements.append(HRFlowable(
                 width="100%", thickness=0.5, color=HexColor("#eee"),
                 spaceAfter=8, spaceBefore=4
             ))
+
+    # ═══ DEPLOYMENT VERDICT (Pro/Enterprise/Deep Audit) ═══
+    verdict = audit_data.get("deployment_verdict", "")
+    if verdict:
+        verdict_color = {
+            "SAFE TO DEPLOY": "#00aa55",
+            "DEPLOY WITH CAUTION": "#ff9900",
+            "DO NOT DEPLOY": "#ff3366"
+        }.get(verdict, "#666666")
+
+        elements.append(Spacer(1, 16))
+        elements.append(Paragraph(
+            f'DEPLOYMENT VERDICT',
+            ParagraphStyle('VerdictLabel', parent=styles['Normal'],
+                           fontSize=8, fontName='Helvetica-Bold',
+                           textColor=HexColor("#999999"),
+                           letterSpacing=2, spaceBefore=8, spaceAfter=4)
+        ))
+        elements.append(Paragraph(
+            f'<font color="{verdict_color}" size="16"><b>{verdict}</b></font>',
+            ParagraphStyle('Verdict', parent=styles['Normal'],
+                           fontSize=16, fontName='Helvetica-Bold',
+                           alignment=TA_CENTER, spaceBefore=4, spaceAfter=12,
+                           backColor=HexColor("#f8f9fa"),
+                           borderColor=HexColor(verdict_color),
+                           borderWidth=1, borderPadding=12)
+        ))
 
     # ═══ FOOTER / DISCLAIMER ═══
     elements.append(Spacer(1, 30))
