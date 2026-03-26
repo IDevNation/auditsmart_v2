@@ -441,6 +441,65 @@ def generate_audit_pdf(audit_data: Dict) -> Optional[bytes]:
                            borderWidth=1, borderPadding=12)
         ))
 
+    # ═══ POWERED BY SECTION ═══
+    elements.append(Spacer(1, 20))
+
+    powered_header = Paragraph(
+        '<font color="#0099cc">POWERED BY</font>',
+        ParagraphStyle('PoweredLabel', parent=styles['Normal'],
+                       fontSize=7, fontName='Helvetica-Bold',
+                       textColor=HexColor("#0099cc"),
+                       letterSpacing=3, spaceAfter=6,
+                       alignment=TA_CENTER)
+    )
+    elements.append(powered_header)
+
+    powered_data = [[
+        Paragraph(
+            '<font color="#333333"><b>Claude</b></font> '
+            '<font color="#999999" size="7">by Anthropic</font>',
+            ParagraphStyle('PwItem', parent=styles['Normal'],
+                           fontSize=9, alignment=TA_CENTER)
+        ),
+        Paragraph(
+            '<font color="#333333"><b>Groq</b></font> '
+            '<font color="#999999" size="7">LLaMA 3.3 70B</font>',
+            ParagraphStyle('PwItem2', parent=styles['Normal'],
+                           fontSize=9, alignment=TA_CENTER)
+        ),
+        Paragraph(
+            '<font color="#333333"><b>Gemini</b></font> '
+            '<font color="#999999" size="7">by Google</font>',
+            ParagraphStyle('PwItem3', parent=styles['Normal'],
+                           fontSize=9, alignment=TA_CENTER)
+        ),
+        Paragraph(
+            '<font color="#333333"><b>Slither</b></font> '
+            '<font color="#999999" size="7">by Crytic</font>',
+            ParagraphStyle('PwItem4', parent=styles['Normal'],
+                           fontSize=9, alignment=TA_CENTER)
+        ),
+    ]]
+
+    powered_table = Table(powered_data, colWidths=[120, 120, 120, 120])
+    powered_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), HexColor("#f0f8ff")),
+        ('BOX', (0, 0), (-1, -1), 0.5, HexColor("#0099cc")),
+        ('LINEAFTER', (0, 0), (-2, -1), 0.3, HexColor("#dee2e6")),
+        ('PADDING', (0, 0), (-1, -1), 10),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    ]))
+    elements.append(powered_table)
+    elements.append(Spacer(1, 6))
+
+    elements.append(Paragraph(
+        'Multi-agent AI security pipeline — each provider contributes specialized analysis capabilities',
+        ParagraphStyle('PoweredNote', parent=styles['Normal'],
+                       fontSize=7, textColor=HexColor("#aaaaaa"),
+                       alignment=TA_CENTER, spaceAfter=12)
+    ))
+
     # ═══ FOOTER / DISCLAIMER ═══
     elements.append(Spacer(1, 30))
     elements.append(HRFlowable(
@@ -472,6 +531,37 @@ def generate_audit_pdf(audit_data: Dict) -> Optional[bytes]:
     doc.build(elements)
     pdf_bytes = buffer.getvalue()
     buffer.close()
+
+    # ═══ ENCRYPT PDF — non-editable, tamper-resistant ═══
+    # Owner password prevents editing/copying. No user password = anyone can view/print.
+    try:
+        from pypdf import PdfReader as PyPdfReader, PdfWriter as PyPdfWriter
+
+        reader_enc = PyPdfReader(io.BytesIO(pdf_bytes))
+        writer_enc = PyPdfWriter()
+
+        for page in reader_enc.pages:
+            writer_enc.add_page(page)
+
+        # Copy metadata
+        if reader_enc.metadata:
+            writer_enc.add_metadata(reader_enc.metadata)
+
+        # Encrypt: empty user password (open freely), strong owner password (no editing)
+        # permissions: allow printing, deny modification/extraction/annotation
+        writer_enc.encrypt(
+            user_password="",
+            owner_password="AuditSm@rt_S3cur3_2026_!nT3rn4L",
+            permissions_flag=0b0000100000000100  # print only, no modify/copy/annotate
+        )
+
+        enc_buffer = io.BytesIO()
+        writer_enc.write(enc_buffer)
+        pdf_bytes = enc_buffer.getvalue()
+        enc_buffer.close()
+    except Exception as e:
+        # If encryption fails, return unencrypted PDF rather than failing entirely
+        print(f"⚠️ PDF encryption skipped: {e}")
 
     return pdf_bytes
 
