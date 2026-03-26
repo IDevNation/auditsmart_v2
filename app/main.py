@@ -55,6 +55,8 @@ app.add_middleware(
         settings.FRONTEND_URL,
         "https://auditsmart.org",
         "https://www.auditsmart.org",
+        "https://zylithium.org",
+        "https://www.zylithium.org",
     ],
     allow_credentials=True,
     allow_methods=["*"],
