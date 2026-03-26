@@ -120,6 +120,16 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 
 .rv{opacity:0;transform:translateY(28px);transition:all .8s cubic-bezier(.16,1,.3,1)}.rv.vis{opacity:1;transform:translateY(0)}
 
+/* POWERED BY STRIP */
+.powered-strip{padding:20px 36px 0;text-align:center;position:relative;z-index:5}
+.powered-label{font-family:var(--fm);font-size:7px;letter-spacing:3px;color:var(--w4);margin-bottom:12px;text-transform:uppercase}
+.powered-logos{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.powered-item{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,.04);border-radius:8px;background:linear-gradient(135deg,rgba(255,255,255,.02),transparent);transition:.4s;cursor:default}
+.powered-item:hover{border-color:color-mix(in srgb,var(--accent) 25%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 5%,transparent),transparent);transform:translateY(-2px);box-shadow:0 4px 15px color-mix(in srgb,var(--accent) 8%,transparent)}
+.pw-name{font-family:'Times New Roman',Times,Georgia,serif;font-size:12px;font-weight:700;color:#fff;letter-spacing:1px}
+.pw-sub{font-family:var(--fm);font-size:6.5px;color:var(--w4);letter-spacing:.5px;margin-left:2px}
+.powered-div{width:1px;height:20px;background:rgba(255,255,255,.06)}
+
 /* ══════════════════════════════════
    AUTH MODAL
 ══════════════════════════════════ */
@@ -276,8 +286,8 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 .toast.error{background:rgba(239,68,68,.9);border:1px solid rgba(239,68,68,.5)}
 .toast.info{background:rgba(74,158,255,.9);border:1px solid rgba(74,158,255,.5)}
 
-@media(max-width:900px){.fgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:1fr 1fr}.agrid{grid-template-columns:repeat(5,1fr)}nav{padding:8px 16px}.nlinks{display:none}.hero{padding:65px 16px 16px}.sec{padding:30px 16px}.proof-in{flex-wrap:wrap}.ps+.ps::before{display:none}.ps{padding:10px 12px}footer{flex-direction:column;text-align:center}.htitle{font-size:clamp(20px,8vw,34px)!important}.vortex-wrap{width:170px;height:170px}#vortexCanvas{width:170px;height:170px}.v-as-text,.v-as-text .as-bg{font-size:34px!important}.radar-wrap{width:100px;height:100px}.hbadge{font-size:7px!important}.audit-row{grid-template-columns:1fr}.dash-stats{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.agrid{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:1fr}.htitle{font-size:clamp(18px,7vw,28px)!important}.vortex-wrap{width:150px;height:150px}#vortexCanvas{width:150px;height:150px}.v-as-text,.v-as-text .as-bg{font-size:28px!important}.app-tabs{display:none}.risk-counts{gap:6px}.dash-stats{grid-template-columns:1fr}}
+@media(max-width:900px){.fgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:1fr 1fr}.agrid{grid-template-columns:repeat(5,1fr)}nav{padding:8px 16px}.nlinks{display:none}.hero{padding:65px 16px 16px}.sec{padding:30px 16px}.proof-in{flex-wrap:wrap}.ps+.ps::before{display:none}.ps{padding:10px 12px}footer{flex-direction:column;text-align:center}.htitle{font-size:clamp(20px,8vw,34px)!important}.vortex-wrap{width:170px;height:170px}#vortexCanvas{width:170px;height:170px}.v-as-text,.v-as-text .as-bg{font-size:34px!important}.radar-wrap{width:100px;height:100px}.hbadge{font-size:7px!important}.audit-row{grid-template-columns:1fr}.dash-stats{grid-template-columns:1fr 1fr}.powered-logos{gap:10px}.powered-div{display:none}.powered-item{padding:6px 10px}}
+@media(max-width:600px){.agrid{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:1fr}.htitle{font-size:clamp(18px,7vw,28px)!important}.vortex-wrap{width:150px;height:150px}#vortexCanvas{width:150px;height:150px}.v-as-text,.v-as-text .as-bg{font-size:28px!important}.app-tabs{display:none}.risk-counts{gap:6px}.dash-stats{grid-template-columns:1fr}.powered-logos{flex-direction:column;gap:6px}.powered-div{display:none}}
 </style>
 </head>
 <body>
@@ -317,7 +327,7 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
   <div class="v-glow"></div>
   <div class="v-as"><div class="v-as-text"><span class="as-bg">AS</span><span class="as-main">AS</span></div></div>
 </div>
-<div class="hbadge"><span class="dot"></span>10 AI AGENTS &nbsp;•&nbsp; GROQ + GEMINI + CLAUDE + SLITHER &nbsp;•&nbsp; &lt; 60 SECONDS</div>
+<div class="hbadge"><span class="dot"></span>10 AI AGENTS &nbsp;•&nbsp; GROQ + GEMINI + <span style="color:#d97757;font-weight:600">CLAUDE</span> + SLITHER &nbsp;•&nbsp; &lt; 60 SECONDS</div>
 <h1 class="htitle"><span class="ln"><span>Secure Your</span></span><span class="ln"><span class="grad">Smart Contracts</span></span><span class="ln"><span>Before Hackers Do</span></span></h1>
 <p class="hsub">Multi-agent AI security finds vulnerabilities in Solidity in under 60 seconds. Professional PDF reports at 1% the cost of manual audits.</p>
 <div class="hbtns"><button class="btn-p" id="heroAuditBtn">START FREE AUDIT</button><button class="btn-s" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">HOW IT WORKS ↓</button></div>
@@ -325,6 +335,32 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 </div></section>
 
 <div class="proof"><div class="proof-in rv"><div class="ps"><div class="ps-n" data-c="10">0</div><div class="ps-l">AI Agents</div></div><div class="ps"><div class="ps-n" data-c="10">0</div><div class="ps-l">Parallel Scans</div></div><div class="ps"><div class="ps-n" data-c="60">0</div><div class="ps-l">Sec / Audit</div></div><div class="ps"><div class="ps-n">PDF</div><div class="ps-l">Reports</div></div><div class="ps"><div class="ps-n">$29</div><div class="ps-l">/ Month Pro</div></div></div></div>
+
+<!-- POWERED BY TRUST STRIP -->
+<div class="powered-strip rv">
+  <div class="powered-label">POWERED BY</div>
+  <div class="powered-logos">
+    <div class="powered-item" style="--accent:#d97757">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 7v5c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V7l-8-5z" stroke="#d97757" stroke-width="1.8"/><path d="M8 12l3 3 5-5" stroke="#d97757" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="pw-name">Claude</span><span class="pw-sub">by Anthropic</span>
+    </div>
+    <div class="powered-div"></div>
+    <div class="powered-item" style="--accent:#f97316">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f97316" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="pw-name">Groq</span><span class="pw-sub">LLaMA 3.3 70B</span>
+    </div>
+    <div class="powered-div"></div>
+    <div class="powered-item" style="--accent:#4285f4">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9" stroke="#4285f4" stroke-width="1.5" fill="none"/></svg>
+      <span class="pw-name">Gemini</span><span class="pw-sub">by Google</span>
+    </div>
+    <div class="powered-div"></div>
+    <div class="powered-item" style="--accent:#10b981">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#10b981"/></svg>
+      <span class="pw-name">Slither</span><span class="pw-sub">by Crytic</span>
+    </div>
+  </div>
+</div>
 
 <section class="sec" id="features"><div class="sec-in"><span class="sec-tag rv">CAPABILITIES</span><h2 class="sec-t rv">Why Developers Trust AuditSmart</h2><div class="sec-line rv"></div><p class="sec-d rv">Not another generic scanner. 10 parallel agents, deduplication engine, and actionable results.</p><div class="fgrid">
 <div class="hud fc rv" data-tilt style="border-top:2px solid #4a9eff;background:linear-gradient(135deg,rgba(74,158,255,.08),rgba(74,158,255,.02))"><div class="cn tl"></div><div class="cn tr"></div><div class="cn bl"></div><div class="cn br"></div><div class="sl"></div><span class="fi" style="background:linear-gradient(135deg,#0d2a5e,#1d6fef);padding:10px;border-radius:10px;display:inline-block">🛡️</span><div class="ft" style="-webkit-text-fill-color:#4a9eff;color:#4a9eff">MULTI-AGENT PIPELINE</div><div class="fd">8 Groq specialist agents + Gemini cross-validator + Slither static analysis. Each agent targets one vulnerability class.</div></div>
@@ -342,7 +378,7 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 <div class="hud stp rv" style="border-top:2px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.07),transparent)"><div class="cn tl"></div><div class="cn br"></div><div class="sl"></div><div class="sn" style="color:rgba(245,158,11,.15)">04</div><span class="si" style="background:linear-gradient(135deg,#78350f,#d97706);border-radius:10px;padding:8px;display:inline-block">📄</span><div class="st" style="color:#fbbf24">PDF REPORT</div><div class="sd">Download branded report</div></div>
 </div></div></section>
 
-<section class="sec" id="agents"><div class="sec-in"><span class="sec-tag rv">AI ARSENAL</span><h2 class="sec-t rv">10 Agents. Zero Blind Spots.</h2><div class="sec-line rv"></div><div class="agrid rv">
+<section class="sec" id="agents"><div class="sec-in"><span class="sec-tag rv">AI ARSENAL</span><h2 class="sec-t rv">10 Agents. Every Angle Covered.</h2><div class="sec-line rv"></div><div class="agrid rv">
 <div class="ag" style="border-color:rgba(239,68,68,.2)"><span class="ai" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="an" style="color:#f87171">REENTRANCY</div><div class="at"><svg width="8" height="8" viewBox="0 0 24 24" fill="#f97316" style="vertical-align:middle;margin-right:2px"><circle cx="12" cy="12" r="10"/></svg>Groq</div></div>
 <div class="ag" style="border-color:rgba(245,158,11,.2)"><span class="ai" style="background:linear-gradient(135deg,#78350f,#d97706);border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/></svg></span><div class="an" style="color:#fbbf24">OVERFLOW</div><div class="at"><svg width="8" height="8" viewBox="0 0 24 24" fill="#f97316" style="vertical-align:middle;margin-right:2px"><circle cx="12" cy="12" r="10"/></svg>Groq</div></div>
 <div class="ag" style="border-color:rgba(74,158,255,.2)"><span class="ai" style="background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#7db3ff" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#7db3ff" stroke-width="1.5"/></svg></span><div class="an" style="color:#7db3ff">ACCESS CTRL</div><div class="at"><svg width="8" height="8" viewBox="0 0 24 24" fill="#f97316" style="vertical-align:middle;margin-right:2px"><circle cx="12" cy="12" r="10"/></svg>Groq</div></div>
