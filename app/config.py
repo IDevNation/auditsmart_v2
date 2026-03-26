@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = ""
 
     # ── Plan Limits ───────────────────────────────────────────────────────────
-    FREE_AUDITS_LIMIT: int = 10
+    FREE_AUDITS_LIMIT: int = 3
     PRO_AUDITS_LIMIT: int = 15
     ENTERPRISE_AUDITS_LIMIT: int = 20
 
@@ -68,5 +68,5 @@ print(f"  GROQ:        {'✅' if settings.GROQ_API_KEY else '❌ MISSING'}")
 print(f"  GEMINI:      {'✅' if settings.GEMINI_API_KEY else '❌ MISSING'} (Free plan)")
 print(f"  ANTHROPIC:   {'✅' if settings.ANTHROPIC_API_KEY else '❌ MISSING'} (Pro/Ent/Deep)")
 print(f"  RAZORPAY:    {'✅' if settings.RAZORPAY_KEY_ID else '⚠️  Not set'}")
-print(f"  Plans: Free(10) | Pro(15) | Ent(20) | DeepAudit($20/ea)")
+print(f"  Plans: Free(3) | Pro(15) | Ent(20) | DeepAudit($20/ea)")
 print("=" * 55)

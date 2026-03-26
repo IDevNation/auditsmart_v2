@@ -2,7 +2,7 @@
 AuditSmart v3.1 — Payment Routes
 
 Plans:
-  Free       → $0  | 10 audits | Groq only (8 agents)
+  Free       → $0  | 3 audits  | Groq only (8 agents)
   Pro        → $29 | 15 audits | Groq + Claude Haiku (fix suggestions + verdict)
   Enterprise → $49 | 20 audits | Groq + Claude Sonnet (exploit + fix code + verdict)
   Deep Audit → $20 per audit   | Claude Opus + Extended Thinking (any plan)
@@ -46,7 +46,7 @@ PLAN_FEATURES = {
     "free": {
         "price_usd":       0,
         "price_inr":       0,
-        "audits":          10,
+        "audits":          3,
         "ai_engine":       "Groq LLaMA 3.3 70B (8 Specialist Agents)",
         "pdf_report":      True,
         "fix_suggestions": False,
