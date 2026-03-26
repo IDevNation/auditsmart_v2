@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # ── AI APIs ───────────────────────────────────────────────────────────────
     GROQ_API_KEY: str = ""
-    GEMINI_API_KEY: str = ""           # Free plan uses this
+    GEMINI_API_KEY: str = ""           # Backup orchestrator (skipped in free to save quota)
     ANTHROPIC_API_KEY: str = ""        # Pro, Enterprise, Deep Audit
 
     # ── Gemini Settings ────────────────────────────────────────────────────────
@@ -27,10 +27,10 @@ class Settings(BaseSettings):
     AGENT_TIMEOUT_SECONDS: int = 120
 
     # ── Claude Model Map ──────────────────────────────────────────────────────
-    # free       → Groq + Gemini              (~$0.05/audit)
-    # pro        → Groq + claude-haiku        (~$0.12/audit)
-    # enterprise → Groq + claude-sonnet       (~$0.49/audit)
-    # deep_audit → Full claude-opus-4-6 only  (~$1.78/audit, charges $20)
+    # free       → Groq ONLY (8 agents, no orchestrator)  → $0 cost
+    # pro        → Groq + Claude Haiku (fix suggestions)  → ~$0.10/audit
+    # enterprise → Groq + Claude Sonnet (exploit + fix)   → ~$0.50/audit
+    # deep_audit → Groq + Claude Opus + Thinking          → ~$2.50/audit
     CLAUDE_HAIKU_MODEL: str = "claude-haiku-4-5-20251001"
     CLAUDE_SONNET_MODEL: str = "claude-sonnet-4-6-20250514"
     CLAUDE_OPUS_MODEL: str = "claude-opus-4-6-20250625"
@@ -41,9 +41,9 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = ""
 
     # ── Plan Limits ───────────────────────────────────────────────────────────
-    FREE_AUDITS_LIMIT: int = 3
-    PRO_AUDITS_LIMIT: int = 20
-    ENTERPRISE_AUDITS_LIMIT: int = 50
+    FREE_AUDITS_LIMIT: int = 10
+    PRO_AUDITS_LIMIT: int = 15
+    ENTERPRISE_AUDITS_LIMIT: int = 20
 
     # ── Deep Audit Pricing ────────────────────────────────────────────────────
     DEEP_AUDIT_PRICE_INR: int = 1650   # ~$20 USD in INR paise = 165000 paise
@@ -68,5 +68,5 @@ print(f"  GROQ:        {'✅' if settings.GROQ_API_KEY else '❌ MISSING'}")
 print(f"  GEMINI:      {'✅' if settings.GEMINI_API_KEY else '❌ MISSING'} (Free plan)")
 print(f"  ANTHROPIC:   {'✅' if settings.ANTHROPIC_API_KEY else '❌ MISSING'} (Pro/Ent/Deep)")
 print(f"  RAZORPAY:    {'✅' if settings.RAZORPAY_KEY_ID else '⚠️  Not set'}")
-print(f"  Plans: Free(3) | Pro(20) | Ent(50) | DeepAudit($20/ea)")
+print(f"  Plans: Free(10) | Pro(15) | Ent(20) | DeepAudit($20/ea)")
 print("=" * 55)

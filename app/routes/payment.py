@@ -1,10 +1,10 @@
 """
-AuditSmart v3.0 — Payment Routes
+AuditSmart v3.1 — Payment Routes
 
 Plans:
-  Free       → $0  | 3 audits  | Groq + Gemini
-  Pro        → $29 | 20 audits | Groq + Claude Haiku (fix suggestions)
-  Enterprise → $49 | 50 audits | Groq + Claude Sonnet (exploit scenarios)
+  Free       → $0  | 10 audits | Groq only (8 agents)
+  Pro        → $29 | 15 audits | Groq + Claude Haiku (fix suggestions + verdict)
+  Enterprise → $49 | 20 audits | Groq + Claude Sonnet (exploit + fix code + verdict)
   Deep Audit → $20 per audit   | Claude Opus + Extended Thinking (any plan)
 """
 
@@ -33,23 +33,24 @@ class RazorpayVerifyRequest(BaseModel):
 
 # ── PLAN CONFIG ────────────────────────────────────────────────────────────────
 PLAN_PRICES_PAISE = {
-    "pro":        290000,   # ₹2900 (~$29 USD) [adjusted for INR]
+    "pro":        290000,   # ₹2900 (~$29 USD)
     "enterprise": 490000,   # ₹4900 (~$49 USD)
 }
 
 PLAN_LIMITS = {
-    "pro":        20,
-    "enterprise": 50,
+    "pro":        15,
+    "enterprise": 20,
 }
 
 PLAN_FEATURES = {
     "free": {
         "price_usd":       0,
         "price_inr":       0,
-        "audits":          3,
-        "ai_engine":       "Groq LLaMA 3.3 70B + Gemini",
+        "audits":          10,
+        "ai_engine":       "Groq LLaMA 3.3 70B (8 Specialist Agents)",
         "pdf_report":      True,
         "fix_suggestions": False,
+        "fix_code":        False,
         "exploit_scenarios": False,
         "thinking_chain":  False,
         "deployment_verdict": False,
@@ -58,39 +59,42 @@ PLAN_FEATURES = {
     "pro": {
         "price_usd":       29,
         "price_inr":       2900,
-        "audits":          20,
+        "audits":          15,
         "ai_engine":       "Groq + Claude Haiku (Anthropic)",
         "pdf_report":      True,
-        "fix_suggestions": True,        # ← Pro exclusive
+        "fix_suggestions": True,
+        "fix_code":        True,
         "exploit_scenarios": False,
         "thinking_chain":  False,
-        "deployment_verdict": True,     # ← Pro exclusive
+        "deployment_verdict": True,
         "support":         "Email",
         "powered_by_claude": True,
     },
     "enterprise": {
         "price_usd":       49,
         "price_inr":       4900,
-        "audits":          50,
+        "audits":          20,
         "ai_engine":       "Groq + Claude Sonnet (Anthropic)",
         "pdf_report":      True,
         "fix_suggestions": True,
-        "exploit_scenarios": True,      # ← Enterprise exclusive
+        "fix_code":        True,
+        "exploit_scenarios": True,
         "thinking_chain":  False,
         "deployment_verdict": True,
-        "api_access":      True,        # ← Enterprise exclusive
+        "api_access":      True,
         "support":         "Priority",
         "powered_by_claude": True,
     },
     "deep_audit": {
-        "price_usd":       20,          # Per audit add-on
+        "price_usd":       20,
         "price_inr":       1650,
-        "audits":          1,           # Single audit
-        "ai_engine":       "Claude Opus (Anthropic) — Most Powerful",
+        "audits":          1,
+        "ai_engine":       "Claude Opus + Extended Thinking",
         "pdf_report":      True,
         "fix_suggestions": True,
+        "fix_code":        True,
         "exploit_scenarios": True,
-        "thinking_chain":  True,        # ← Deep Audit exclusive 🧠
+        "thinking_chain":  True,
         "deployment_verdict": True,
         "support":         "Priority",
         "powered_by_claude": True,

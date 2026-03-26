@@ -265,18 +265,30 @@ async def run_audit_pipeline(
           f"Claude: {'✅' if settings.ANTHROPIC_API_KEY else '❌'}")
     print("=" * 65)
 
-    # ── PHASE 1: 8 Groq Agents + Slither (ALL plans) ─────────────────────────
-    # For large contracts, split into chunks so agents see the full code
+    # ── PHASE 1: Groq Agents + Slither (ALL plans) ─────────────────────────
+    # Smart chunking: All 8 agents on chunk 1, only targeted agents on remaining
+    # This reduces API calls from 8×N to 8 + 3×(N-1)
+    TARGETED_AGENTS = ["signature_agent", "defi_agent", "backdoor_agent"]
+    
     contract_chunks = _split_contract(contract_code)
-    print(f"\n📡 Phase 1: 8 Groq agents + Slither (parallel)... [{len(contract_chunks)} chunk(s)]")
+    print(f"\n📡 Phase 1: Groq agents + Slither [{len(contract_chunks)} chunk(s)]")
 
     for chunk_idx, chunk in enumerate(contract_chunks):
+        if chunk_idx == 0:
+            # First chunk: ALL 8 agents (full coverage)
+            agents_for_chunk = AGENT_CONFIGS
+            label = "all 8 agents"
+        else:
+            # Remaining chunks: only 3 targeted agents (saves tokens)
+            agents_for_chunk = [a for a in AGENT_CONFIGS if a["name"] in TARGETED_AGENTS]
+            label = f"{len(agents_for_chunk)} targeted agents"
+
         if len(contract_chunks) > 1:
-            print(f"\n   --- Chunk {chunk_idx + 1}/{len(contract_chunks)} ({len(chunk)} chars) ---")
+            print(f"\n   --- Chunk {chunk_idx + 1}/{len(contract_chunks)} ({len(chunk)} chars) — {label} ---")
 
         groq_tasks = [
             run_groq_analysis(chunk, agent["focus"], agent["name"])
-            for agent in AGENT_CONFIGS
+            for agent in agents_for_chunk
         ]
 
         groq_results, slither_result = await asyncio.gather(
@@ -289,13 +301,13 @@ async def run_audit_pipeline(
         if isinstance(groq_results, list):
             for i, res in enumerate(groq_results):
                 if isinstance(res, Exception):
-                    print(f"   ❌ {AGENT_CONFIGS[i]['name']}: {res}")
+                    print(f"   ❌ {agents_for_chunk[i]['name']}: {res}")
                     continue
                 if res and isinstance(res, list):
                     all_findings.extend(res)
-                    if AGENT_CONFIGS[i]["name"] not in agents_used:
-                        agents_used.append(AGENT_CONFIGS[i]["name"])
-                    print(f"   ✅ {AGENT_CONFIGS[i]['name']}: {len(res)} findings")
+                    if agents_for_chunk[i]["name"] not in agents_used:
+                        agents_used.append(agents_for_chunk[i]["name"])
+                    print(f"   ✅ {agents_for_chunk[i]['name']}: {len(res)} findings")
 
         # Collect Slither (only first chunk)
         if chunk_idx == 0 and not isinstance(slither_result, Exception) and isinstance(slither_result, list):
@@ -307,15 +319,12 @@ async def run_audit_pipeline(
 
     # ── PHASE 2: AI Orchestrator (plan-based) ─────────────────────────────────
     thinking_chain = None
+    claude_verdict = ""
+    claude_summary = ""
 
     if plan == "free":
-        # Free → Gemini
-        print("\n🤖 Phase 2: Gemini Orchestrator (Free plan)...")
-        gemini_result = await run_gemini_analysis(contract_code)
-        if isinstance(gemini_result, list) and gemini_result:
-            all_findings.extend(gemini_result)
-            agents_used.append("gemini_agent")
-            print(f"   ✅ gemini_agent: {len(gemini_result)} findings")
+        # Free → Groq only, NO orchestrator (saves Gemini/Claude quota)
+        print("\n🤖 Phase 2: SKIPPED (Free plan — Groq agents only)")
 
     elif plan in ("pro", "enterprise", "deep_audit"):
         # Pro/Enterprise/Deep → Claude
