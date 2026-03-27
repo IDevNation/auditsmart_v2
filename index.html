@@ -286,8 +286,30 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 .toast.error{background:rgba(239,68,68,.9);border:1px solid rgba(239,68,68,.5)}
 .toast.info{background:rgba(74,158,255,.9);border:1px solid rgba(74,158,255,.5)}
 
-@media(max-width:900px){.fgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:1fr 1fr}.agrid{grid-template-columns:repeat(5,1fr)}nav{padding:8px 16px}.nlinks{display:none}.hero{padding:65px 16px 16px}.sec{padding:30px 16px}.proof-in{flex-wrap:wrap}.ps+.ps::before{display:none}.ps{padding:10px 12px}footer{flex-direction:column;text-align:center}.htitle{font-size:clamp(20px,8vw,34px)!important}.vortex-wrap{width:170px;height:170px}#vortexCanvas{width:170px;height:170px}.v-as-text,.v-as-text .as-bg{font-size:34px!important}.radar-wrap{width:100px;height:100px}.hbadge{font-size:7px!important}.audit-row{grid-template-columns:1fr}.dash-stats{grid-template-columns:1fr 1fr}.powered-logos{gap:10px}.powered-div{display:none}.powered-item{padding:6px 10px}}
-@media(max-width:600px){.agrid{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:1fr}.htitle{font-size:clamp(18px,7vw,28px)!important}.vortex-wrap{width:150px;height:150px}#vortexCanvas{width:150px;height:150px}.v-as-text,.v-as-text .as-bg{font-size:28px!important}.app-tabs{display:none}.risk-counts{gap:6px}.dash-stats{grid-template-columns:1fr}.powered-logos{flex-direction:column;gap:6px}.powered-div{display:none}}
+/* USP COMPARISON */
+.usp-grid{display:flex;align-items:stretch;gap:0;justify-content:center;flex-wrap:wrap}
+.usp-card{flex:1;min-width:220px;max-width:320px;padding:24px 20px;border-radius:10px;background:var(--glass);border:1px solid var(--border)}
+.usp-bad{border-color:rgba(239,68,68,.15);background:linear-gradient(135deg,rgba(239,68,68,.04),rgba(239,68,68,.01))}
+.usp-good{border-color:rgba(74,158,255,.2);background:linear-gradient(135deg,rgba(74,158,255,.06),rgba(6,182,212,.02));box-shadow:0 0 30px rgba(74,158,255,.04)}
+.usp-icon{font-size:24px;margin-bottom:8px}
+.usp-label{font-family:'Times New Roman',Times,Georgia,serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--w3);margin-bottom:14px}
+.usp-row{font-size:12px;color:var(--w2);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);display:flex;align-items:center;gap:8px}
+.usp-x{color:#ef4444;font-weight:700;font-size:14px;width:18px;text-align:center}
+.usp-check{color:#10b981;font-weight:700;font-size:14px;width:18px;text-align:center}
+.usp-vs{display:flex;align-items:center;justify-content:center;padding:0 16px;font-family:'Times New Roman',Times,Georgia,serif;font-size:16px;font-weight:800;color:rgba(168,85,247,.4);letter-spacing:3px}
+
+/* NEW FEATURES CARDS */
+.new-features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.nf-card{padding:20px 16px;background:var(--glass);border:1px solid var(--border);border-radius:8px;transition:.5s;text-align:center;position:relative;overflow:hidden}
+.nf-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.nf-card::after{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,#4a9eff,var(--m1));transform:scaleX(0);transition:.5s;transform-origin:left}
+.nf-card:hover::after{transform:scaleX(1)}
+.nf-icon{font-size:22px;margin-bottom:8px}
+.nf-title{font-family:'Times New Roman',Times,Georgia,serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:6px}
+.nf-desc{font-size:11px;color:var(--w3);line-height:1.7}
+
+@media(max-width:900px){.fgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:1fr 1fr}.agrid{grid-template-columns:repeat(5,1fr)}nav{padding:8px 16px}.nlinks{display:none}.hero{padding:65px 16px 16px}.sec{padding:30px 16px}.proof-in{flex-wrap:wrap}.ps+.ps::before{display:none}.ps{padding:10px 12px}footer{flex-direction:column;text-align:center}.htitle{font-size:clamp(20px,8vw,34px)!important}.vortex-wrap{width:170px;height:170px}#vortexCanvas{width:170px;height:170px}.v-as-text,.v-as-text .as-bg{font-size:34px!important}.radar-wrap{width:100px;height:100px}.hbadge{font-size:7px!important}.audit-row{grid-template-columns:1fr}.dash-stats{grid-template-columns:1fr 1fr}.powered-logos{gap:10px}.powered-div{display:none}.powered-item{padding:6px 10px}.new-features{grid-template-columns:1fr 1fr}.usp-grid{flex-direction:column;align-items:center}.usp-vs{padding:10px 0;transform:rotate(90deg)}}
+@media(max-width:600px){.agrid{grid-template-columns:repeat(3,1fr)}.steps{grid-template-columns:1fr}.htitle{font-size:clamp(18px,7vw,28px)!important}.vortex-wrap{width:150px;height:150px}#vortexCanvas{width:150px;height:150px}.v-as-text,.v-as-text .as-bg{font-size:28px!important}.app-tabs{display:none}.risk-counts{gap:6px}.dash-stats{grid-template-columns:1fr}.powered-logos{flex-direction:column;gap:6px}.powered-div{display:none}.new-features{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -303,7 +325,7 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
     <div><span class="nlogo-t">AUDITSMART</span><span class="nlogo-s">AI SECURITY PLATFORM</span></div>
   </div>
   <div class="nlinks" id="navLinks">
-    <a href="#features">Features</a><a href="#how">How It Works</a><a href="#agents">Agents</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+    <a href="#features">Features</a><a href="#how">How It Works</a><a href="#usp">Why AuditSmart</a><a href="#agents">Agents</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
   </div>
   <!-- Guest nav -->
   <div id="navGuest"><button class="ncta" id="navLaunchBtn">LOGIN</button></div>
@@ -377,6 +399,36 @@ footer{padding:30px 36px;border-top:1px solid rgba(74,158,255,.04);display:flex;
 <div class="hud stp rv" style="border-top:2px solid #10b981;background:linear-gradient(180deg,rgba(16,185,129,.07),transparent)"><div class="cn tl"></div><div class="cn br"></div><div class="sl"></div><div class="sn" style="color:rgba(16,185,129,.15)">03</div><span class="si" style="background:linear-gradient(135deg,#064e3b,#059669);border-radius:10px;padding:8px;display:inline-block">🔧</span><div class="st" style="color:#34d399">DEDUP & VALIDATE</div><div class="sd">Clean, unique findings only</div></div>
 <div class="hud stp rv" style="border-top:2px solid #f59e0b;background:linear-gradient(180deg,rgba(245,158,11,.07),transparent)"><div class="cn tl"></div><div class="cn br"></div><div class="sl"></div><div class="sn" style="color:rgba(245,158,11,.15)">04</div><span class="si" style="background:linear-gradient(135deg,#78350f,#d97706);border-radius:10px;padding:8px;display:inline-block">📄</span><div class="st" style="color:#fbbf24">PDF REPORT</div><div class="sd">Download branded report</div></div>
 </div></div></section>
+
+<section class="sec" id="usp" style="background:linear-gradient(180deg,transparent,rgba(168,85,247,.008),transparent)"><div class="sec-in"><span class="sec-tag rv">WHY AUDITSMART</span><h2 class="sec-t rv">Manual Audit vs AuditSmart</h2><div class="sec-line rv"></div><p class="sec-d rv">We don't replace manual audits. We're what you run BEFORE spending lakhs on one.</p>
+
+<div class="usp-grid rv">
+<div class="usp-card usp-bad"><div class="usp-icon">🏢</div><div class="usp-label">MANUAL AUDIT</div>
+<div class="usp-row"><span class="usp-x">✕</span> $5,000 – $100,000+</div>
+<div class="usp-row"><span class="usp-x">✕</span> 2–6 weeks delivery</div>
+<div class="usp-row"><span class="usp-x">✕</span> 1–3 reviewers</div>
+<div class="usp-row"><span class="usp-x">✕</span> No iteration after changes</div>
+<div class="usp-row"><span class="usp-x">✕</span> Basic PDF report</div>
+</div>
+<div class="usp-vs">VS</div>
+<div class="usp-card usp-good"><div class="usp-icon">⚡</div><div class="usp-label" style="color:#4a9eff">AUDITSMART</div>
+<div class="usp-row"><span class="usp-check">✓</span> ₹160 per audit (Pro)</div>
+<div class="usp-row"><span class="usp-check">✓</span> Under 60 seconds</div>
+<div class="usp-row"><span class="usp-check">✓</span> 10 parallel AI agents</div>
+<div class="usp-row"><span class="usp-check">✓</span> Re-audit after every fix</div>
+<div class="usp-row"><span class="usp-check">✓</span> Branded PDF + fix code + verdict</div>
+</div>
+</div>
+
+<!-- NEW FEATURES STRIP -->
+<div class="new-features rv" style="margin-top:28px">
+<div class="nf-card" data-tilt><div class="nf-icon" style="color:#a855f7">🔗</div><div class="nf-title">Shareable Report Links</div><div class="nf-desc">Every audit gets a unique public URL. Share with investors, list on PinkSale, embed anywhere.</div></div>
+<div class="nf-card" data-tilt><div class="nf-icon" style="color:#4a9eff">🛡️</div><div class="nf-title">Trust Badge System</div><div class="nf-desc">Embed "AuditSmart Verified" badge on your website. Shows risk score — builds instant credibility.</div></div>
+<div class="nf-card" data-tilt><div class="nf-icon" style="color:#10b981">🔒</div><div class="nf-title">Zero Code Storage</div><div class="nf-desc">Your contract code is never stored. We retain only a SHA256 hash for verification. Privacy by design.</div></div>
+<div class="nf-card" data-tilt><div class="nf-icon" style="color:#f59e0b">📄</div><div class="nf-title">Tamper-Proof PDF</div><div class="nf-desc">Reports are encrypted with owner-password protection. No one can edit or forge your audit report.</div></div>
+</div>
+
+</div></section>
 
 <section class="sec" id="agents"><div class="sec-in"><span class="sec-tag rv">AI ARSENAL</span><h2 class="sec-t rv">10 Agents. Every Angle Covered.</h2><div class="sec-line rv"></div><div class="agrid rv">
 <div class="ag" style="border-color:rgba(239,68,68,.2)"><span class="ai" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);border-radius:8px;padding:6px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="an" style="color:#f87171">REENTRANCY</div><div class="at"><svg width="8" height="8" viewBox="0 0 24 24" fill="#f97316" style="vertical-align:middle;margin-right:2px"><circle cx="12" cy="12" r="10"/></svg>Groq</div></div>
@@ -912,8 +964,23 @@ function renderResults(d){
   if(d.summary){
     summaryHtml=`<div style="margin:8px 0;padding:10px;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.1);border-radius:4px;font-size:11px;color:var(--w3);font-family:var(--fm)">${esc(d.summary)}</div>`;
   }
+  // Shareable link + Badge embed
+  let shareHtml='';
+  if(d.report_id){
+    const pubUrl=API+'/public/report/'+d.report_id;
+    const badgeUrl=API+'/public/badge/'+d.report_id;
+    shareHtml=`<div style="margin:14px 0;padding:14px;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.1);border-radius:8px">
+      <div style="font-family:var(--fm);font-size:9px;color:#4a9eff;letter-spacing:1.5px;margin-bottom:8px;font-weight:600">🔗 SHARE THIS REPORT</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <a href="${pubUrl}" target="_blank" style="font-family:var(--fm);font-size:9px;padding:6px 14px;background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.2);border-radius:4px;color:#4a9eff;text-decoration:none;transition:.3s" onmouseover="this.style.background='rgba(74,158,255,.15)'" onmouseout="this.style.background='rgba(74,158,255,.08)'">📄 View Public Report</a>
+        <button onclick="navigator.clipboard.writeText('${pubUrl}');toast('Link copied!','success')" style="font-family:var(--fm);font-size:9px;padding:6px 14px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:4px;color:#c084fc;cursor:pointer;transition:.3s" onmouseover="this.style.background='rgba(168,85,247,.15)'" onmouseout="this.style.background='rgba(168,85,247,.08)'">📋 Copy Link</button>
+      </div>
+      <div style="font-family:var(--fm);font-size:8px;color:var(--w4);margin-bottom:4px">EMBED TRUST BADGE ON YOUR WEBSITE:</div>
+      <div style="background:rgba(0,0,0,.3);border:1px solid rgba(74,158,255,.08);border-radius:4px;padding:8px;font-family:var(--fm);font-size:9px;color:var(--w4);word-break:break-all;cursor:pointer" onclick="navigator.clipboard.writeText('<iframe src=\\'${badgeUrl}\\' width=\\'280\\' height=\\'80\\' frameborder=\\'0\\'></iframe>');toast('Badge code copied!','success')">&lt;iframe src="${badgeUrl}" width="280" height="80" frameborder="0"&gt;&lt;/iframe&gt;<span style="float:right;color:#4a9eff">📋 click to copy</span></div>
+    </div>`;
+  }
   const extraSection=document.getElementById('findingsList');
-  extraSection.insertAdjacentHTML('afterend',`<div id="auditExtras">${verdictHtml}${summaryHtml}${thinkHtml}</div>`);
+  extraSection.insertAdjacentHTML('afterend',`<div id="auditExtras">${verdictHtml}${summaryHtml}${shareHtml}${thinkHtml}</div>`);
 }
 
 function resetAudit(){
