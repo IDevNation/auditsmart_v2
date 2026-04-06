@@ -204,7 +204,7 @@ async def public_report_page(report_id: str):
         pdf_btn = f'<a href="/public/report/{report_id}/pdf" style="display:inline-block;padding:8px 18px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:5px;color:#c084fc;font-size:11px;text-decoration:none;letter-spacing:1px;transition:.3s">📄 DOWNLOAD PDF</a>'
 
     # Badge embed snippet
-    badge_snippet = f'&lt;iframe src="https://web-production-de7ca.up.railway.app/public/badge/{report_id}" width="280" height="80" frameborder="0"&gt;&lt;/iframe&gt;'
+    badge_snippet = f'&lt;iframe src="https://api.zylithium.org/public/badge/{report_id}" width="280" height="80" frameborder="0"&gt;&lt;/iframe&gt;'
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -481,7 +481,7 @@ async def badge_js(report_id: str):
     """
     js = f"""(function(){{
   var d=document,f=d.createElement('iframe');
-  f.src='https://web-production-de7ca.up.railway.app/public/badge/{report_id}';
+  f.src='https://api.zylithium.org/public/badge/{report_id}';
   f.width='280';f.height='80';f.frameBorder='0';
   f.style.border='none';f.style.overflow='hidden';
   f.setAttribute('loading','lazy');
