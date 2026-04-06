@@ -57,6 +57,8 @@ app.add_middleware(
         settings.FRONTEND_URL,
         "https://auditsmart.org",
         "https://www.auditsmart.org",
+        "https://web-production-de7ca.up.railway.app",
+        "https://api.zylithium.org",
         "https://zylithium.org",
         "https://www.zylithium.org",
     ],
