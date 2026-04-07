@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["python311", "solc"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt", "pip install slither-analyzer --break-system-packages"]

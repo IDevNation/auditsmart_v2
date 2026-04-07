@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     DB_NAME: str = "auditsmart"
 
     # ── JWT ───────────────────────────────────────────────────────────────────
-    JWT_SECRET: str = "change-this-secret-in-production"
+    JWT_SECRET: str = "as-jwt-s3cr3t-xor10n-2026-ch4ng3-1n-pr0d"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_HOURS: int = 48
 
@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     DEEP_AUDIT_PRICE_USD: float = 20.0
 
     # ── App ───────────────────────────────────────────────────────────────────
-    FRONTEND_URL: str = "https://auditsmart.org"
+    FRONTEND_URL: str = "https://zylithium.org"
     MAX_CONTRACT_SIZE: int = 50000
     RATE_LIMIT_PER_MINUTE: int = 5
     PDF_ENABLED: bool = True
