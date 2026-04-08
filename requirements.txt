@@ -9,7 +9,7 @@ passlib[bcrypt]==1.7.4
 groq>=0.12.0
 google-generativeai>=0.8.0
 anthropic>=0.40.0
-razorpay==1.4.1
+razorpay==2.0.1
 python-multipart==0.0.9
 bcrypt==4.0.1
 reportlab>=4.1.0
