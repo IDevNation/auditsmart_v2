@@ -10,6 +10,7 @@ Plans:
 
 import hashlib
 import hmac
+import razorpay
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from app.utils.auth import get_current_user

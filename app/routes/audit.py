@@ -18,6 +18,7 @@ from bson import ObjectId
 import base64
 import hashlib
 import hmac
+import razorpay
 
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -191,7 +192,7 @@ async def scan_contract(
     response = serialize_audit(audit_doc.copy())
     response["report_id"] = audit_doc.get("report_id", "")
     response["contract_hash"] = audit_doc.get("contract_hash", "")
-    response["verify_url"] = f"https://auditsmart.org/verify/{audit_doc.get('report_id', '')}"
+    response["verify_url"] = f"{settings.FRONTEND_URL}/verify/{audit_doc.get('report_id', '')}"
     response["pdf_available"] = result.get("pdf_available", False)
     response["has_fix_suggestions"] = result.get("has_fix_suggestions", False)
     response["deployment_verdict"] = result.get("deployment_verdict", "")
@@ -410,7 +411,7 @@ async def verify_report(report_id: str):
     """
     Public endpoint — anyone can verify if a report is real.
     No authentication needed. Returns report metadata only, no findings detail.
-    URL: auditsmart.org/verify/AS-2026-00001
+    URL: zylithium.org/verify/AS-2026-00001
     """
     db = get_db()
 
@@ -468,5 +469,5 @@ async def verify_report(report_id: str):
             "the absence of vulnerabilities. For production contracts, "
             "a professional manual audit is recommended."
         ),
-        "verify_url": f"https://auditsmart.org/verify/{audit.get('report_id', '')}"
+        "verify_url": f"{settings.FRONTEND_URL}/verify/{audit.get('report_id', '')}"
     }

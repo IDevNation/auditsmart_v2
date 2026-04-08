@@ -13,6 +13,7 @@ Endpoints:
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse, Response
 from app.database import get_db
+from app.config import settings
 from datetime import datetime
 
 router = APIRouter()
@@ -100,7 +101,7 @@ DISCLAIMER = (
 async def public_report_page(report_id: str):
     """
     Public shareable report page. No auth needed.
-    URL: auditsmart.org/report/AS-2026-00001
+    URL: zylithium.org/report/AS-2026-00001
     """
     audit = await _get_public_audit(report_id)
 
@@ -246,7 +247,7 @@ a{{color:#4a9eff;text-decoration:none}}
 <div class="wrap">
     <div class="header">
         <div><span class="logo">AUDITSMART</span><span class="logo-sub">AI SECURITY PLATFORM</span></div>
-        <a href="https://auditsmart.org" style="font-size:10px;padding:6px 14px;border:1px solid rgba(74,158,255,.2);border-radius:4px;color:#4a9eff;letter-spacing:1px">RUN FREE AUDIT →</a>
+        <a href="{settings.FRONTEND_URL}" style="font-size:10px;padding:6px 14px;border:1px solid rgba(74,158,255,.2);border-radius:4px;color:#4a9eff;letter-spacing:1px">RUN FREE AUDIT →</a>
     </div>
 
     <div class="disclaimer">⚠️ {DISCLAIMER}</div>
@@ -293,7 +294,7 @@ a{{color:#4a9eff;text-decoration:none}}
     <div class="embed-box">{badge_snippet}</div>
 
     <div class="footer">
-        <p>© 2026 AuditSmart · AI Security Assessment Tool · <a href="https://auditsmart.org">auditsmart.org</a></p>
+        <p>© 2026 AuditSmart · AI Security Assessment Tool · <a href="{settings.FRONTEND_URL}">{settings.FRONTEND_URL.replace('https://','')}</a></p>
         <p style="margin-top:4px">Report ID: {report_id} · Verified: ✅</p>
     </div>
 </div>
@@ -330,8 +331,8 @@ async def public_report_json(report_id: str):
         "scan_duration_ms": audit.get("scan_duration_ms", 0),
         "scanned_at": created,
         "disclaimer": DISCLAIMER,
-        "report_url": f"https://auditsmart.org/report/{report_id}",
-        "badge_url": f"https://auditsmart.org/badge/{report_id}",
+        "report_url": f"{settings.FRONTEND_URL}/report/{report_id}",
+        "badge_url": f"{settings.FRONTEND_URL}/badge/{report_id}",
     }
 
 
@@ -373,7 +374,7 @@ async def badge_html(report_id: str):
     risk_score = audit.get("risk_score", 0)
     risk_color = _risk_color(risk_level)
     contract_name = audit.get("contract_name", "Contract")
-    report_url = f"https://auditsmart.org/report/{report_id}"
+    report_url = f"{settings.FRONTEND_URL}/report/{report_id}"
 
     # Risk label
     if risk_score <= 25:

@@ -1,6 +1,8 @@
 # AuditSmart v3.1
 ### AI-Powered Smart Contract Security
 
+> 📋 **Dev Handover:** See [HANDOVER.md](./HANDOVER.md) for full setup, testing checklist, and known issues.
+
 > **⚠️ Disclaimer:** AuditSmart is an AI-assisted security screening tool. Reports are NOT certified security audits. For production contracts handling significant value, a professional manual audit is strongly recommended alongside this tool.
 
 ---
