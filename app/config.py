@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     DEEP_AUDIT_PRICE_USD: float = 20.0
 
     # ── App ───────────────────────────────────────────────────────────────────
-    FRONTEND_URL: str = "https://auditsmart.org"
+    FRONTEND_URL: str = "https://zylithium.org"
     MAX_CONTRACT_SIZE: int = 50000
     RATE_LIMIT_PER_MINUTE: int = 5
     PDF_ENABLED: bool = True
